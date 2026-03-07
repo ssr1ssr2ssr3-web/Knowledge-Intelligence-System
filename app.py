@@ -7,6 +7,7 @@ from google import genai
 load_dotenv()
 
 # The client uses the GEMINI_API_KEY environment variable automatically
+# This additional comment is to validate whether it is syncing properly in the Github environment
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
