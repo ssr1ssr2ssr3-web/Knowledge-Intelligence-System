@@ -16,5 +16,4 @@ EXPOSE 8501
 # Run command
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
-
-docker build -t AI_ProjectEc2Deployment .
+ 
