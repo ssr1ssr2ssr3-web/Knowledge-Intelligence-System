@@ -8,7 +8,7 @@ load_dotenv()
 
 # The client uses the GEMINI_API_KEY environment variable automatically
 # This additional comment is to validate whether it is syncing properly in the Github environment
-# This additional comment is to ensure CI CD isworking properly in the Github environment
+# This additional comment is to ensure CI CD-2 isworking properly in the Github environment
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
