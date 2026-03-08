@@ -25,10 +25,10 @@ theme_toggle = st.toggle("Dark Mode", value=(st.session_state.theme == "Dark"))
 st.session_state.theme = "Dark" if theme_toggle else "Light"
 
 # --- DYNAMIC CSS STYLING ---
-bg_color = "#e5ddd5" if st.session_state.theme == "Light" else "#0b141a"
-chat_bg = "#ffffff" if st.session_state.theme == "Light" else "#202c33"
-text_color = "#000000" if st.session_state.theme == "Light" else "#ffffff"
-border_color = "#d1d1d1" if st.session_state.theme == "Light" else "#3e5263"
+bg_color = "#f6800b" if st.session_state.theme == "Light" else "#0b141a"
+chat_bg = "#7f2a2a" if st.session_state.theme == "Light" else "#202c33"
+text_color = "#000000" if st.session_state.theme == "Light" else "#4736ad"
+border_color = "#cd5858" if st.session_state.theme == "Light" else "#3e5263"
 input_bg = "linear-gradient(90deg, #ffffff, #f0f2f6)" if st.session_state.theme == "Light" else "linear-gradient(90deg, #202c33, #111b21)"
 
 st.markdown(f"""
