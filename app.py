@@ -70,8 +70,13 @@ st.session_state.last_active = now
 qp = st.query_params
 if "mobile" in qp:
     st.session_state.is_mobile = (qp["mobile"] == "1")
-if "mode" in qp and qp["mode"] in ["General","Document","URL"]:
+if "mode" in qp and qp["mode"] in ["General", "Document", "URL"]:
     st.session_state.mode = qp["mode"]
+if "theme" in qp:
+    if qp["theme"] == "light":
+        st.session_state.theme = "Light"
+    elif qp["theme"] == "dark":
+        st.session_state.theme = "Dark"
 if qp.get("clear") == "1":
     for k in list(st.session_state.keys()):
         del st.session_state[k]
@@ -81,51 +86,49 @@ if qp.get("clear") == "1":
 is_mobile = st.session_state.is_mobile
 
 # ══════════════════════════════════════════════
-# THEME
+# COLOURS
 # ══════════════════════════════════════════════
 DARK = {
-    "bg":           "#07112a",
-    "chat_bg":      "#0a1628",
-    "card":         "#0f2040",
-    "card2":        "#152848",
-    "border":       "#1a3060",
-    "border2":      "#234080",
-    "text":         "#e8f2ff",
-    "text2":        "#b8d0f0",
-    "muted":        "#6888b0",
-    "accent":       "#3b9eff",
-    "accent2":      "#00d4ff",
-    "accent3":      "#00c9a7",
-    "user_bg":      "linear-gradient(135deg,#1a3a70,#1e4888)",
-    "user_border":  "#2a5aaa",
-    "ai_bg":        "linear-gradient(135deg,#0a1e3a,#0e2448)",
-    "ai_border":    "#1a3060",
-    "input_bg":     "#ffffff",
-    "input_text":   "#0a1628",
-    "input_border": "#c8d8f0",
-    "footer_bg":    "#ffffff",
+    "bg":          "#07112a",
+    "chat_bg":     "#0a1628",
+    "card":        "#0f2040",
+    "card2":       "#152848",
+    "border":      "#1a3060",
+    "border2":     "#234080",
+    "text":        "#e8f2ff",
+    "text2":       "#b8d0f0",
+    "muted":       "#6888b0",
+    "accent":      "#3b9eff",
+    "accent2":     "#00d4ff",
+    "accent3":     "#00c9a7",
+    "user_bg":     "linear-gradient(135deg,#1a3a70,#1e4888)",
+    "user_border": "#2a5aaa",
+    "ai_bg":       "linear-gradient(135deg,#0a1e3a,#0e2448)",
+    "ai_border":   "#1a3060",
+    "input_bg":    "#0c1a32",
+    "input_text":  "#e8f2ff",
+    "footer_bg":   "#0a1628",
 }
 LIGHT = {
-    "bg":           "#e8f2ff",
-    "chat_bg":      "#dce8f8",
-    "card":         "#ffffff",
-    "card2":        "#e8f0ff",
-    "border":       "#c0d0e8",
-    "border2":      "#a0bcdc",
-    "text":         "#0a1628",
-    "text2":        "#1a3050",
-    "muted":        "#4a6080",
-    "accent":       "#1a56db",
-    "accent2":      "#0891b2",
-    "accent3":      "#059669",
-    "user_bg":      "linear-gradient(135deg,#dbeafe,#bfdbfe)",
-    "user_border":  "#93c5fd",
-    "ai_bg":        "linear-gradient(135deg,#ffffff,#f0f6ff)",
-    "ai_border":    "#c0d0e8",
-    "input_bg":     "#ffffff",
-    "input_text":   "#0a1628",
-    "input_border": "#a0bcdc",
-    "footer_bg":    "#ffffff",
+    "bg":          "#e8f2ff",
+    "chat_bg":     "#dce8f8",
+    "card":        "#ffffff",
+    "card2":       "#e8f0ff",
+    "border":      "#c0d0e8",
+    "border2":     "#a0bcdc",
+    "text":        "#0a1628",
+    "text2":       "#1a3050",
+    "muted":       "#4a6080",
+    "accent":      "#1a56db",
+    "accent2":     "#0891b2",
+    "accent3":     "#059669",
+    "user_bg":     "linear-gradient(135deg,#dbeafe,#bfdbfe)",
+    "user_border": "#93c5fd",
+    "ai_bg":       "linear-gradient(135deg,#ffffff,#f0f6ff)",
+    "ai_border":   "#c0d0e8",
+    "input_bg":    "#ffffff",
+    "input_text":  "#0a1628",
+    "footer_bg":   "#1a56db",
 }
 T = DARK if st.session_state.theme == "Dark" else LIGHT
 
@@ -133,116 +136,106 @@ T = DARK if st.session_state.theme == "Dark" else LIGHT
 # CSS
 # ══════════════════════════════════════════════
 if is_mobile:
-    # ── MOBILE LAYOUT: fixed header + fixed footer, scrollable middle ──
     css = f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
-*, *::before, *::after {{ box-sizing: border-box; }}
-html, body {{ height: 100%; overflow: hidden; margin: 0; padding: 0; }}
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 
-/* Hide ALL Streamlit chrome */
+/* ── Hide all Streamlit chrome ── */
 #MainMenu, footer, header,
 [data-testid="stToolbar"],
 [data-testid="stDecoration"],
 [data-testid="stStatusWidget"],
-.stDeployButton,
-[data-testid="collapsedControl"] {{ display: none !important; }}
+[data-testid="stSidebarNav"],
+.stDeployButton {{ display: none !important; }}
 
-/* Full screen app */
+/* ── Full screen app ── */
+html, body {{ height: 100vh; overflow: hidden; }}
+
 .stApp {{
     background: {T["chat_bg"]} !important;
     font-family: 'Outfit', sans-serif !important;
     height: 100vh !important;
     overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
 }}
 
-/* Remove ALL streamlit padding */
-.main, .block-container {{
+/* ── Remove all default padding ── */
+.main, section.main {{
+    padding: 0 !important;
+    overflow: hidden !important;
+    height: 100vh !important;
+}}
+
+.block-container {{
     padding: 0 !important;
     margin: 0 !important;
-    max-width: 100% !important;
+    max-width: 100vw !important;
     width: 100% !important;
-    height: 100% !important;
-}}
-
-[data-testid="stVerticalBlock"] {{
-    gap: 0 !important;
-    padding: 0 !important;
-}}
-
-/* ── FIXED TOP HEADER — 10vh ── */
-.mobile-header {{
-    position: fixed !important;
-    top: 0 !important; left: 0 !important; right: 0 !important;
-    height: 10vh !important;
-    min-height: 56px !important;
-    background: linear-gradient(135deg,{T["card"]} 0%,{T["card2"]} 100%) !important;
-    border-bottom: 1px solid {T["border2"]} !important;
-    z-index: 1000 !important;
-    display: flex !important;
-    align-items: center !important;
-    padding: 0 14px !important;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.3) !important;
-}}
-
-/* ── SCROLLABLE CHAT AREA — between header and footer ── */
-[data-testid="stBottom"] {{
-    display: none !important;
-}}
-
-.chat-scroll-area {{
-    position: fixed !important;
-    top: 10vh !important;
-    bottom: 10vh !important;
-    left: 0 !important; right: 0 !important;
+    /* top = header height, bottom = footer height */
+    padding-top: 68px !important;
+    padding-bottom: 80px !important;
+    height: 100vh !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding: 10px 12px 10px !important;
-    background: {T["chat_bg"]} !important;
     -webkit-overflow-scrolling: touch !important;
 }}
 
-/* ── FIXED BOTTOM INPUT — 10vh ── */
-.mobile-footer {{
+/* ── FIXED TOP HEADER ── */
+[data-testid="stHeader"] {{
+    display: none !important;
+}}
+
+.srin-header {{
     position: fixed !important;
-    bottom: 0 !important; left: 0 !important; right: 0 !important;
-    height: 10vh !important;
-    min-height: 56px !important;
-    background: {T["footer_bg"]} !important;
-    border-top: 1px solid {T["input_border"]} !important;
-    z-index: 1000 !important;
+    top: 0 !important; left: 0 !important; right: 0 !important;
+    height: 68px !important;
+    background: linear-gradient(135deg, {T["card"]} 0%, {T["card2"]} 100%) !important;
+    border-bottom: 1px solid {T["border2"]} !important;
+    z-index: 9999 !important;
     display: flex !important;
     align-items: center !important;
-    padding: 0 10px !important;
+    padding: 0 12px !important;
     gap: 8px !important;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.4) !important;
+}}
+
+/* ── FIXED BOTTOM FOOTER ── */
+.srin-footer {{
+    position: fixed !important;
+    bottom: 0 !important; left: 0 !important; right: 0 !important;
+    height: 80px !important;
+    background: {T["footer_bg"]} !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 12px !important;
+    gap: 10px !important;
 }}
 
 /* ── CHAT MESSAGES ── */
 [data-testid="stChatMessage"] {{
-    border-radius: 12px !important;
-    padding: 8px 12px !important;
-    margin-bottom: 6px !important;
+    border-radius: 14px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 8px !important;
 }}
 
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {{
     background: {T["user_bg"]} !important;
     border: 1px solid {T["user_border"]} !important;
-    margin-left: 8% !important;
+    margin-left: 6% !important;
 }}
 
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {{
     background: {T["ai_bg"]} !important;
     border: 1px solid {T["ai_border"]} !important;
-    margin-right: 8% !important;
+    margin-right: 6% !important;
 }}
 
 [data-testid="stChatMessage"] p {{
     color: {T["text"]} !important;
-    font-size: 13px !important;
-    line-height: 1.55 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
     margin: 0 !important;
     font-family: 'Outfit', sans-serif !important;
 }}
@@ -255,68 +248,105 @@ html, body {{ height: 100%; overflow: hidden; margin: 0; padding: 0; }}
 [data-testid="stChatMessage"] code {{
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 11px !important;
-    background: rgba(59,158,255,0.12) !important;
+    background: rgba(59,158,255,0.15) !important;
     color: {T["accent2"]} !important;
     padding: 1px 5px !important;
     border-radius: 4px !important;
 }}
 
-/* ── CHAT INPUT — simple clean white box ── */
+/* ── CHAT INPUT — the key part ──
+   Streamlit renders stBottom fixed at the bottom already.
+   We just style it to match our footer bar.
+── */
+[data-testid="stBottom"] {{
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 80px !important;
+    background: {T["footer_bg"]} !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    z-index: 9999 !important;
+    border-top: none !important;
+    box-shadow: 0 -2px 20px rgba(0,0,0,0.3) !important;
+}}
+
+[data-testid="stBottom"] > div {{
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}}
+
+/* The chat input widget itself */
 [data-testid="stChatInput"] {{
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
-    flex: 1 !important;
+    width: 100% !important;
 }}
 
+/* White curved input box inside blue footer */
 [data-testid="stChatInput"] textarea {{
-    background: {T["input_bg"]} !important;
-    color: {T["input_text"]} !important;
-    -webkit-text-fill-color: {T["input_text"]} !important;
-    border: 1.5px solid {T["input_border"]} !important;
-    border-radius: 22px !important;
+    background: #ffffff !important;
+    color: #0a1628 !important;
+    -webkit-text-fill-color: #0a1628 !important;
+    border: none !important;
+    border-radius: 24px !important;
     font-family: 'Outfit', sans-serif !important;
-    font-size: 14px !important;
-    padding: 10px 16px !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    padding: 14px 20px !important;
     line-height: 1.4 !important;
     caret-color: {T["accent"]} !important;
     outline: none !important;
     resize: none !important;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08) !important;
-}}
-
-[data-testid="stChatInput"] textarea:focus {{
-    border-color: {T["accent"]} !important;
-    box-shadow: 0 0 0 2px {T["accent"]}20 !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
+    width: 100% !important;
 }}
 
 [data-testid="stChatInput"] textarea::placeholder {{
     color: #94a3b8 !important;
     -webkit-text-fill-color: #94a3b8 !important;
     font-style: italic !important;
-    font-size: 13px !important;
+    opacity: 1 !important;
 }}
 
-/* Send button */
+[data-testid="stChatInput"] textarea:focus {{
+    outline: none !important;
+    box-shadow: 0 2px 16px rgba(255,255,255,0.3) !important;
+}}
+
+/* Send button — white circle with blue arrow */
 [data-testid="stChatInput"] button {{
-    background: {T["accent"]} !important;
+    background: #ffffff !important;
     border: none !important;
     border-radius: 50% !important;
-    width: 36px !important;
-    height: 36px !important;
-    box-shadow: 0 2px 8px {T["accent"]}40 !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
     flex-shrink: 0 !important;
+    cursor: pointer !important;
+}}
+
+[data-testid="stChatInput"] button:hover {{
+    background: #f0f6ff !important;
+    transform: scale(1.05) !important;
 }}
 
 [data-testid="stChatInput"] button svg {{
-    fill: #ffffff !important;
-    stroke: #ffffff !important;
+    fill: {T["accent"]} !important;
+    stroke: {T["accent"]} !important;
+    width: 20px !important;
+    height: 20px !important;
 }}
 
-/* ── BUTTONS ── */
+/* ── OTHER WIDGETS ── */
 .stButton > button {{
-    background: transparent !important;
+    background: rgba(255,255,255,0.08) !important;
     color: {T["muted"]} !important;
     border: 1px solid {T["border"]} !important;
     border-radius: 999px !important;
@@ -331,35 +361,39 @@ html, body {{ height: 100%; overflow: hidden; margin: 0; padding: 0; }}
     color: {T["accent"]} !important;
 }}
 
-/* ── FILE UPLOADER ── */
 [data-testid="stFileUploader"] {{
     background: {T["card"]} !important;
     border: 1.5px dashed {T["border2"]} !important;
     border-radius: 10px !important;
 }}
 
-/* ── TEXT INPUT ── */
 .stTextInput input {{
     background: {T["input_bg"]} !important;
     color: {T["input_text"]} !important;
     -webkit-text-fill-color: {T["input_text"]} !important;
     border: 1.5px solid {T["border2"]} !important;
     border-radius: 8px !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
+}}
+
+.stAlert {{
+    border-radius: 10px !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13px !important;
 }}
 
 ::-webkit-scrollbar {{ width: 3px; }}
 ::-webkit-scrollbar-thumb {{ background: {T["border2"]}; border-radius: 2px; }}
 
 iframe[height="0"] {{
-    position: absolute !important; width: 0 !important;
-    height: 0 !important; border: none !important;
-    pointer-events: none !important;
+    position: absolute !important;
+    width: 0 !important; height: 0 !important;
+    border: none !important; pointer-events: none !important;
 }}
 </style>
 """
 else:
-    # ── DESKTOP LAYOUT ──
+    # ── DESKTOP CSS ──
     css = f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -425,21 +459,22 @@ else:
     font-size: 12px !important;
     background: rgba(59,158,255,0.12) !important;
     color: {T["accent2"]} !important;
-    padding: 1px 6px !important; border-radius: 4px !important;
+    padding: 1px 6px !important;
+    border-radius: 4px !important;
 }}
 
 [data-testid="stChatInput"] {{
     background: #0c1a32 !important;
     border: 1.5px solid {T["border2"]} !important;
     border-radius: 18px !important;
-    box-shadow: 0 4px 28px rgba(0,0,0,0.4),0 0 0 1px rgba(59,158,255,0.1) !important;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,158,255,0.1) !important;
     backdrop-filter: blur(20px) !important;
     padding: 6px 8px !important;
 }}
 
 [data-testid="stChatInput"]:focus-within {{
     border-color: {T["accent"]} !important;
-    box-shadow: 0 4px 32px rgba(59,158,255,0.25),0 0 0 2px {T["accent"]}40 !important;
+    box-shadow: 0 4px 32px rgba(59,158,255,0.25), 0 0 0 2px {T["accent"]}40 !important;
 }}
 
 [data-testid="stChatInput"] textarea {{
@@ -449,7 +484,8 @@ else:
     font-family: 'Outfit', sans-serif !important;
     font-size: 15px !important;
     caret-color: {T["accent"]} !important;
-    border: none !important; outline: none !important;
+    border: none !important;
+    outline: none !important;
     resize: none !important;
     padding: 10px 14px !important;
     line-height: 1.5 !important;
@@ -463,17 +499,18 @@ else:
 
 [data-testid="stChatInput"] button {{
     background: linear-gradient(135deg,{T["accent"]},{T["accent2"]}) !important;
-    border: none !important; border-radius: 12px !important;
-    width: 38px !important; height: 38px !important;
+    border: none !important;
+    border-radius: 12px !important;
+    width: 38px !important;
+    height: 38px !important;
     box-shadow: 0 2px 10px {T["accent"]}50 !important;
 }}
 
-[data-testid="stChatInput"] button:hover {{
-    transform: scale(1.08) !important;
-}}
+[data-testid="stChatInput"] button:hover {{ transform: scale(1.08) !important; }}
 
 [data-testid="stChatInput"] button svg {{
-    fill: #ffffff !important; stroke: #ffffff !important;
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
 }}
 
 .stButton > button {{
@@ -482,7 +519,8 @@ else:
     border: 1px solid {T["border"]} !important;
     border-radius: 999px !important;
     font-family: 'Outfit', sans-serif !important;
-    font-size: 13px !important; font-weight: 600 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
     padding: 5px 14px !important;
 }}
 
@@ -514,14 +552,20 @@ else:
     box-shadow: 0 0 0 2px {T["accent"]}25 !important;
 }}
 
-.stTextInput label {{ color: {T["muted"]} !important; font-size: 11px !important; }}
-[data-testid="stToggle"] label {{ color: {T["muted"]} !important; font-size: 11px !important; }}
-.stAlert {{ border-radius: 10px !important; font-family: 'Outfit', sans-serif !important; }}
+.stTextInput label, [data-testid="stToggle"] label {{
+    color: {T["muted"]} !important;
+    font-size: 11px !important;
+}}
+
+.stAlert {{
+    border-radius: 10px !important;
+    font-family: 'Outfit', sans-serif !important;
+}}
 
 iframe[height="0"] {{
-    position: absolute !important; width: 0 !important;
-    height: 0 !important; border: none !important;
-    pointer-events: none !important;
+    position: absolute !important;
+    width: 0 !important; height: 0 !important;
+    border: none !important; pointer-events: none !important;
 }}
 </style>
 """
@@ -570,69 +614,87 @@ st.components.v1.html(f"""
 """, height=0, scrolling=False)
 
 # ══════════════════════════════════════════════
-# HEADER
+# MOBILE FIXED HEADER — pure HTML injected via JS
 # ══════════════════════════════════════════════
-mode_icons  = {"General":"💬","Document":"📄","URL":"🔗"}
-mode_colors = {"General":T["accent"],"Document":T["accent3"],"URL":T["accent2"]}
+mode_icons  = {"General":"💬", "Document":"📄", "URL":"🔗"}
+mode_colors = {"General": T["accent"], "Document": T["accent3"], "URL": T["accent2"]}
 active_color = mode_colors[st.session_state.mode]
-# Build mode pills HTML for mobile header
-mode_pills_html = ""
-for _m in ["General", "Document", "URL"]:
-    _active = st.session_state.mode == _m
-    _bg     = T["accent"] if _active else "rgba(255,255,255,0.08)"
-    _col    = "#ffffff"   if _active else T["muted"]
-    _bord   = T["accent"] if _active else T["border"]
-    mode_pills_html += (
-        f'<a href="?mode={_m}&mobile=1" style="' +
-        f'background:{_bg};color:{_col};border:1px solid {_bord};' +
-        f'border-radius:999px;padding:3px 8px;font-size:10px;font-weight:600;' +
-        f'text-decoration:none;font-family:Outfit,sans-serif;white-space:nowrap;">' +
-        f'{mode_icons[_m]}</a>'
-    )
+current_mode = st.session_state.mode
 
 if is_mobile:
-    # Fixed mobile header rendered as HTML
-    st.markdown(f"""
-<div class="mobile-header">
-    <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-        <div style="
-            width:36px;height:36px;border-radius:10px;flex-shrink:0;
-            background:linear-gradient(135deg,{T['accent']},{T['accent2']});
-            display:flex;align-items:center;justify-content:center;
-            font-size:18px;box-shadow:0 0 12px {T['accent']}40;
-        ">💬</div>
-        <div style="min-width:0;">
-            <div style="font-size:16px;font-weight:800;color:{T['text']};
-                letter-spacing:-0.3px;line-height:1.1;white-space:nowrap;">
-                SuperChat <span style="color:{T['accent']};">AI</span>
-            </div>
-            <div style="font-size:9px;color:{T['muted']};letter-spacing:1px;
-                text-transform:uppercase;font-weight:600;">SRIN AI Solutions</div>
-        </div>
-    </div>
-    <!-- Mode pills -->\n    <div style="display:flex;gap:4px;flex-shrink:0;">\n        {mode_pills_html}
-    </div>
-    <!-- Theme toggle -->
-    <div style="margin-left:6px;flex-shrink:0;">
-        <a href="?mode={st.session_state.mode}&mobile=1&theme={'light' if st.session_state.theme=='Dark' else 'dark'}"
-            style="font-size:16px;text-decoration:none;">
-            {'🌙' if st.session_state.theme=='Dark' else '☀️'}
-        </a>
-    </div>
-</div>
-<div style="height:10vh;min-height:56px;"></div>
-""", unsafe_allow_html=True)
+    # Build mode pills
+    pills = ""
+    for m in ["General","Document","URL"]:
+        active = st.session_state.mode == m
+        bg    = T["accent"]             if active else "rgba(255,255,255,0.1)"
+        col   = "#ffffff"               if active else T["muted"]
+        bord  = T["accent"]             if active else "rgba(255,255,255,0.2)"
+        pills += (
+            f'<a href="?mode={m}&mobile=1" style="'
+            f'background:{bg};color:{col};border:1px solid {bord};'
+            f'border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700;'
+            f'text-decoration:none;white-space:nowrap;font-family:Outfit,sans-serif;">'
+            f'{mode_icons[m]} {m}</a>'
+        )
 
-    # Handle theme toggle via query param
-    if qp.get("theme") == "light" and st.session_state.theme == "Dark":
-        st.session_state.theme = "Light"
-        st.rerun()
-    elif qp.get("theme") == "dark" and st.session_state.theme == "Light":
-        st.session_state.theme = "Dark"
-        st.rerun()
+    theme_link = "dark" if st.session_state.theme == "Light" else "light"
+    theme_icon = "☀️" if st.session_state.theme == "Dark" else "🌙"
+
+    # Inject header via JS into parent document body
+    # This avoids Streamlit's layout entirely
+    st.components.v1.html(f"""
+<script>
+(function(){{
+  // Remove existing header if any
+  var existing = window.parent.document.getElementById('srin-mobile-header');
+  if(existing) existing.remove();
+
+  var header = window.parent.document.createElement('div');
+  header.id = 'srin-mobile-header';
+  header.style.cssText = [
+    'position:fixed','top:0','left:0','right:0','height:68px',
+    'background:linear-gradient(135deg,{T["card"]},{T["card2"]})',
+    'border-bottom:1px solid {T["border2"]}',
+    'z-index:99999','display:flex','align-items:center',
+    'padding:0 12px','gap:8px',
+    'box-shadow:0 2px 20px rgba(0,0,0,0.5)',
+    'font-family:Outfit,sans-serif'
+  ].join(';');
+
+  header.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+      <div style="width:38px;height:38px;border-radius:11px;flex-shrink:0;
+        background:linear-gradient(135deg,{T["accent"]},{T["accent2"]});
+        display:flex;align-items:center;justify-content:center;
+        font-size:20px;box-shadow:0 0 14px {T["accent"]}50;">💬</div>
+      <div style="min-width:0;">
+        <div style="font-size:17px;font-weight:800;color:{T["text"]};
+          letter-spacing:-0.3px;line-height:1.1;white-space:nowrap;">
+          SuperChat <span style="color:{T["accent"]};">AI</span>
+        </div>
+        <div style="font-size:9px;color:{T["muted"]};letter-spacing:1.5px;
+          text-transform:uppercase;font-weight:600;">SRIN AI Solutions</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:5px;flex-shrink:0;">
+      {pills}
+    </div>
+    <a href="?mode={current_mode}&mobile=1&theme={theme_link}"
+      style="font-size:20px;text-decoration:none;flex-shrink:0;margin-left:4px;">
+      {theme_icon}
+    </a>
+  `;
+  window.parent.document.body.prepend(header);
+
+  // Push streamlit content down
+  var app = window.parent.document.querySelector('.stApp');
+  if(app) app.style.paddingTop = '68px';
+}})();
+</script>
+""", height=0, scrolling=False)
 
 else:
-    # Desktop header
+    # ── DESKTOP HEADER via st.markdown ──
     st.markdown(f"""
 <div style="
     background:linear-gradient(135deg,{T['card']} 0%,{T['card2']} 100%);
@@ -645,39 +707,33 @@ else:
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
         <div style="display:flex;align-items:center;gap:12px;">
-            <div style="
-                width:46px;height:46px;border-radius:13px;
+            <div style="width:46px;height:46px;border-radius:13px;
                 background:linear-gradient(135deg,{T['accent']},{T['accent2']});
                 display:flex;align-items:center;justify-content:center;
-                font-size:23px;box-shadow:0 0 18px {T['accent']}50;flex-shrink:0;
-            ">💬</div>
+                font-size:23px;box-shadow:0 0 18px {T['accent']}50;flex-shrink:0;">💬</div>
             <div>
-                <div style="font-family:'Outfit',sans-serif;font-size:21px;
-                    font-weight:800;color:{T['text']};letter-spacing:-0.5px;line-height:1.1;">
+                <div style="font-size:21px;font-weight:800;color:{T['text']};
+                    letter-spacing:-0.5px;line-height:1.1;">
                     SuperChat&nbsp;<span style="color:{T['accent']};">AI</span>
                 </div>
                 <div style="font-size:10px;color:{T['muted']};letter-spacing:1.5px;
-                    text-transform:uppercase;font-weight:600;">
-                    🖥 SRIN AI Solutions
-                </div>
+                    text-transform:uppercase;font-weight:600;">🖥 SRIN AI Solutions</div>
             </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
             <div style="background:{T['accent']}18;border:1px solid {T['accent']}45;
                 border-radius:999px;padding:3px 11px;font-size:9px;
                 color:{T['accent']};font-weight:700;letter-spacing:1px;text-transform:uppercase;">
-                gemini-2.5-flash
-            </div>
+                gemini-2.5-flash</div>
             <div style="background:#00c9a720;border:1px solid #00c9a750;
                 border-radius:999px;padding:3px 9px;font-size:9px;
-                color:#00c9a7;font-weight:700;">● LIVE
-            </div>
+                color:#00c9a7;font-weight:700;">● LIVE</div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-    # Desktop: mode pills + theme toggle
+    # Desktop mode pills + theme toggle
     col_modes, col_toggle = st.columns([5,1])
     with col_toggle:
         tog = st.toggle("🌙", value=(st.session_state.theme=="Dark"),
@@ -709,23 +765,24 @@ else:
     background:linear-gradient(90deg,transparent,{active_color}99,{active_color},transparent);">
 </div>""", unsafe_allow_html=True)
 
-current_mode = st.session_state.mode
-
 # ══════════════════════════════════════════════
 # DOCUMENT / URL PANELS
 # ══════════════════════════════════════════════
+pad = "8px 12px" if is_mobile else "10px 16px"
+fs1 = "11px"    if is_mobile else "12px"
+fs2 = "10px"    if is_mobile else "11px"
+br  = "10px"    if is_mobile else "12px"
+
 if current_mode == "Document":
     st.markdown(f"""
 <div style="background:{T['card']};border:1px solid {T['border2']};
-    border-left:3px solid {T['accent3']};
-    border-radius:{'10px' if is_mobile else '12px'};
-    padding:{'8px 12px' if is_mobile else '10px 16px'};
-    margin-bottom:{'6px' if is_mobile else '10px'};">
-    <div style="font-size:{'11px' if is_mobile else '12px'};color:{T['accent3']};
-        font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">
+    border-left:3px solid {T['accent3']};border-radius:{br};
+    padding:{pad};margin-bottom:8px;">
+    <div style="font-size:{fs1};color:{T['accent3']};font-weight:700;
+        letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">
         📄 Upload Document
     </div>
-    <div style="font-size:{'10px' if is_mobile else '11px'};color:{T['muted']};">
+    <div style="font-size:{fs2};color:{T['muted']};">
         PDF · DOCX · TXT &nbsp;·&nbsp;
         <span style="color:{T['accent']};">Session only — never stored.</span>
     </div>
@@ -751,8 +808,8 @@ if current_mode == "Document":
             else:
                 text = uploaded.read().decode("utf-8", errors="ignore")
             if text.strip():
-                mc = 6000 if is_mobile else 12000
-                st.session_state.doc_context = text[:mc]
+                mc2 = 6000 if is_mobile else 12000
+                st.session_state.doc_context = text[:mc2]
                 st.session_state.doc_name    = uploaded.name
                 st.session_state.messages    = []
                 st.success(f"✅ Loaded **{uploaded.name}** ({len(text):,} chars)")
@@ -766,16 +823,14 @@ if current_mode == "Document":
 elif current_mode == "URL":
     st.markdown(f"""
 <div style="background:{T['card']};border:1px solid {T['border2']};
-    border-left:3px solid {T['accent2']};
-    border-radius:{'10px' if is_mobile else '12px'};
-    padding:{'8px 12px' if is_mobile else '10px 16px'};
-    margin-bottom:{'6px' if is_mobile else '10px'};">
-    <div style="font-size:{'11px' if is_mobile else '12px'};color:{T['accent2']};
-        font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">
+    border-left:3px solid {T['accent2']};border-radius:{br};
+    padding:{pad};margin-bottom:8px;">
+    <div style="font-size:{fs1};color:{T['accent2']};font-weight:700;
+        letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">
         🔗 Load a URL
     </div>
-    <div style="font-size:{'10px' if is_mobile else '11px'};color:{T['muted']};">
-        Any public page · docs · blogs · knowledge bases.&nbsp;
+    <div style="font-size:{fs2};color:{T['muted']};">
+        Any public page · docs · blogs.&nbsp;
         <span style="color:{T['accent']};">Session only — never stored.</span>
     </div>
 </div>""", unsafe_allow_html=True)
@@ -806,8 +861,8 @@ elif current_mode == "URL":
                     raw = r.text
                 lines = [l.strip() for l in raw.splitlines() if l.strip()]
                 clean = "\n".join(lines)
-                mc = 6000 if is_mobile else 12000
-                st.session_state.url_context = clean[:mc]
+                mc2 = 6000 if is_mobile else 12000
+                st.session_state.url_context = clean[:mc2]
                 st.session_state.url_loaded  = url_val
                 st.session_state.messages    = []
                 st.success(f"✅ Loaded ({len(clean):,} chars)")
@@ -832,13 +887,14 @@ if not st.session_state.messages and not doc_missing and not url_missing:
     }
     ico, title, hint = hints[current_mode]
     st.markdown(f"""
-<div style="text-align:center;padding:{'20px 10px' if is_mobile else '44px 20px'};color:{T['muted']};">
-    <div style="font-size:{'32px' if is_mobile else '44px'};margin-bottom:10px;">{ico}</div>
-    <div style="font-size:{'14px' if is_mobile else '17px'};font-weight:700;
+<div style="text-align:center;padding:{'20px 10px' if is_mobile else '44px 20px'};
+    color:{T['muted']};">
+    <div style="font-size:{'36px' if is_mobile else '44px'};margin-bottom:10px;">{ico}</div>
+    <div style="font-size:{'15px' if is_mobile else '17px'};font-weight:700;
         color:{T['text']};margin-bottom:8px;">{title}</div>
     <div style="font-size:{'11px' if is_mobile else '12px'};color:{T['muted']};
         font-style:italic;background:{T['card']};border:1px solid {T['border']};
-        border-radius:8px;padding:6px 12px;display:inline-block;">{hint}</div>
+        border-radius:8px;padding:6px 14px;display:inline-block;">{hint}</div>
 </div>""", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════
@@ -852,16 +908,18 @@ for msg in st.session_state.messages:
 # PROMPT BUILDER
 # ══════════════════════════════════════════════
 def build_prompt(user_input):
-    mob = ("IMPORTANT: User is on mobile. "
-           "Max 120 words. Use bullet points. No long intros.\n\n") if is_mobile else ""
+    mob = (
+        "IMPORTANT: User is on mobile. Max 120 words. "
+        "Bullet points preferred. No long intros.\n\n"
+    ) if is_mobile else ""
     m = st.session_state.mode
     if m == "Document" and st.session_state.doc_context:
         return (f"{mob}Answer ONLY from the document. If not found say so.\n\n"
                 f"=== DOCUMENT ===\n{st.session_state.doc_context}\n=== END ===\n\n"
                 f"Question: {user_input}")
     elif m == "URL" and st.session_state.url_context:
-        return (f"{mob}Answer ONLY from the webpage. Source: {st.session_state.url_loaded}\n"
-                f"If not found say so.\n\n"
+        return (f"{mob}Answer ONLY from the webpage. "
+                f"Source: {st.session_state.url_loaded}\nIf not found say so.\n\n"
                 f"=== PAGE ===\n{st.session_state.url_context}\n=== END ===\n\n"
                 f"Question: {user_input}")
     return f"{mob}{user_input}"
@@ -874,12 +932,6 @@ ph = {
     "Document": "✦  Ask about the document..." if not doc_missing else "Upload a document first...",
     "URL":      "✦  Ask about the page..."     if not url_missing else "Load a URL first...",
 }
-
-if is_mobile:
-    # Spacer so content doesn't hide behind fixed footer
-    st.markdown('<div style="height:10vh;min-height:56px;"></div>', unsafe_allow_html=True)
-    # Render chat input inside the fixed footer div
-    st.markdown('<div class="mobile-footer">', unsafe_allow_html=True)
 
 if prompt := st.chat_input(ph[current_mode], disabled=(doc_missing or url_missing)):
     st.session_state.last_active = time.time()
@@ -900,11 +952,8 @@ if prompt := st.chat_input(ph[current_mode], disabled=(doc_missing or url_missin
                 st.error(err)
                 st.session_state.messages.append({"role":"assistant","content":err})
 
-if is_mobile:
-    st.markdown('</div>', unsafe_allow_html=True)
-
 # ══════════════════════════════════════════════
-# DESKTOP FOOTER STATUS BAR (desktop only)
+# DESKTOP STATUS BAR
 # ══════════════════════════════════════════════
 if not is_mobile:
     status = {
@@ -912,24 +961,20 @@ if not is_mobile:
         "Document": f"📄 {st.session_state.doc_name}" if st.session_state.doc_name else "📄 No document",
         "URL":      f"🔗 {(st.session_state.url_loaded or '')[:45]}" if st.session_state.url_loaded else "🔗 No URL",
     }[current_mode]
-    msg_count = len([m for m in st.session_state.messages if m["role"] == "user"])
+    msg_count    = len([m for m in st.session_state.messages if m["role"] == "user"])
     idle_elapsed = now - st.session_state.last_active
-    idle_pct = min(100, int(idle_elapsed / IDLE_TIMEOUT * 100))
+    idle_pct     = min(100, int(idle_elapsed / IDLE_TIMEOUT * 100))
 
     st.markdown(f"""
-<div style="
-    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+<div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);
     width:min(800px,98vw);background:{T['card']};
-    border-top:1px solid {T['border']};
-    padding:5px 16px;
+    border-top:1px solid {T['border']};padding:5px 16px;
     display:flex;align-items:center;justify-content:space-between;
     z-index:9999;font-family:'Outfit',sans-serif;
-    backdrop-filter:blur(16px);box-shadow:0 -4px 20px rgba(0,0,0,0.2);
-">
+    backdrop-filter:blur(16px);box-shadow:0 -4px 20px rgba(0,0,0,0.2);">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:{T['border']};">
         <div style="height:2px;width:{idle_pct}%;
-            background:linear-gradient(90deg,{T['accent']},{T['accent2']});
-            {'background:linear-gradient(90deg,#ff8800,#ff4444)' if idle_pct > 80 else ''};
+            background:{'linear-gradient(90deg,#ff8800,#ff4444)' if idle_pct>80 else f'linear-gradient(90deg,{T["accent"]},{T["accent2"]})'};
         "></div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
@@ -938,13 +983,10 @@ if not is_mobile:
         <span style="font-size:11px;color:{T['muted']};">{status}</span>
     </div>
     <div style="font-size:10px;color:{T['muted']};display:flex;align-items:center;gap:8px;">
-        <span>🖥 Desktop</span>
-        <span>·</span>
-        <span>{msg_count} msg{"s" if msg_count!=1 else ""}</span>
-        <span>·</span>
+        <span>🖥 Desktop</span><span>·</span>
+        <span>{msg_count} msg{"s" if msg_count!=1 else ""}</span><span>·</span>
         <span style="color:{'#ff8800' if idle_pct>70 else T['muted']};">
-            ⏱ {int((IDLE_TIMEOUT-idle_elapsed)/60)}m left
-        </span>
+            ⏱ {int((IDLE_TIMEOUT-idle_elapsed)/60)}m left</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
