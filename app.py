@@ -232,7 +232,7 @@ html,body{{height:100vh;overflow:hidden;}}
 }}
 .main,section.main{{padding:0 !important;overflow:hidden !important;height:100vh !important;width:100vw !important;}}
 
-/* Scrollable chat — full phone width */
+/* Mobile: ONLY middle scrolls. Header+footer are fixed via JS injection + stBottom CSS */
 .block-container{{
     padding:0 10px !important;
     padding-top:76px !important;
@@ -240,9 +240,16 @@ html,body{{height:100vh;overflow:hidden;}}
     margin:0 !important;
     max-width:100vw !important;
     width:100vw !important;
-    height:100vh !important;
+    /* Fixed height between header and footer — only this scrolls */
+    position:fixed !important;
+    top:68px !important;
+    bottom:68px !important;
+    left:0 !important;right:0 !important;
+    height:auto !important;
     overflow-y:auto !important;overflow-x:hidden !important;
     -webkit-overflow-scrolling:touch !important;
+    padding-top:12px !important;
+    padding-bottom:12px !important;
 }}
 
 {shared_message_css()}
@@ -281,49 +288,55 @@ elif is_tablet:
 
 html,body{{height:100vh;overflow:hidden;}}
 
-/* Full screen background — landing page gradient on sides */
+/* FULL PAGE — landing page gradient covers everything including sides */
 .stApp{{
-    background:{T["side_bg"]} !important;
     font-family:'Outfit',sans-serif !important;
     height:100vh !important;overflow:hidden !important;
+    position:relative !important;
 }}
-/* Dot grid overlay — same as landing page */
+
+/* Landing page gradient as full background */
 .stApp::before{{
     content:'';position:fixed;inset:0;
-    background-image:radial-gradient(circle,rgba(59,158,255,0.05) 1px,transparent 1px);
-    background-size:30px 30px;pointer-events:none;z-index:0;
+    background:linear-gradient(160deg,#040a14 0%,#071020 25%,#091528 55%,#0c1c38 80%,#0e2040 100%);
+    z-index:-2;
+}}
+/* Dot grid overlay on top of gradient */
+.stApp::after{{
+    content:'';position:fixed;inset:0;
+    background-image:radial-gradient(circle,rgba(59,158,255,0.06) 1px,transparent 1px);
+    background-size:30px 30px;pointer-events:none;z-index:-1;
 }}
 
 .main,section.main{{
     padding:0 !important;overflow:hidden !important;height:100vh !important;
-    /* Side panels show the side_bg through the gap */
     background:transparent !important;
 }}
 
-/* Centred chat panel with its own background */
+/* Chat panel centred — dark navy, elevated above the gradient sides */
 .block-container{{
-    max-width:640px !important;
+    max-width:620px !important;
     margin:0 auto !important;
-    padding:0 16px !important;
+    padding:0 18px !important;
     padding-top:80px !important;
-    padding-bottom:84px !important;
+    padding-bottom:80px !important;
     height:100vh !important;
     overflow-y:auto !important;overflow-x:hidden !important;
     -webkit-overflow-scrolling:touch !important;
     background:{T["chat_bg"]} !important;
-    /* Side shadow so panel looks elevated */
-    box-shadow:0 0 60px rgba(0,0,0,0.5) !important;
+    box-shadow:-30px 0 60px rgba(0,0,0,0.6), 30px 0 60px rgba(0,0,0,0.6) !important;
     position:relative !important;
+    z-index:1 !important;
 }}
 
 {shared_message_css()}
 {bottom_input_css()}
 
-/* On tablet, stBottom should only span the content width */
+/* Tablet: stBottom centred over chat panel only */
 [data-testid="stBottom"]{{
     left:50% !important;
     transform:translateX(-50%) !important;
-    width:640px !important;
+    width:620px !important;
     max-width:100vw !important;
 }}
 
