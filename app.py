@@ -401,11 +401,38 @@ st.components.v1.html("""
 </script>
 """, height=0, scrolling=False)
 
+# ── Tablet: inject landing page gradient into parent body via JS ──
+# This is the ONLY reliable way - CSS inside Streamlit iframe cannot reach parent body
+if is_tablet:
+    st.components.v1.html(f"""
+<script>
+(function(){{
+  try{{
+    var grad = '{SIDE_GRAD}';
+    var dot  = 'radial-gradient(circle,rgba(59,158,255,0.06) 1px,transparent 1px)';
+    // Set parent html + body background
+    window.parent.document.documentElement.style.cssText +=
+      ';background:' + grad + ' !important;height:100vh;overflow:hidden;';
+    window.parent.document.body.style.cssText +=
+      ';background:' + grad + ' !important;height:100vh;overflow:hidden;margin:0;';
+    // Add dot grid overlay if not already there
+    if(!window.parent.document.getElementById('srin-dots')){{
+      var d = window.parent.document.createElement('div');
+      d.id = 'srin-dots';
+      d.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;'
+        + 'background-image:' + dot + ';background-size:30px 30px;';
+      window.parent.document.body.appendChild(d);
+    }}
+  }}catch(e){{console.log('tablet bg:', e);}}
+}})();
+</script>
+""", height=0, scrolling=False)
+
 # ── idle timeout ──
 st.components.v1.html(f"""
 <script>
 (function(){{
-  var IDLE={IDLE_TIMEOUT*1000};var t;
+  var IDLE={{IDLE_TIMEOUT*1000}};var t;
   function reset(){{clearTimeout(t);t=setTimeout(function(){{
     try{{var url=new URL(window.parent.location.href);
       url.searchParams.set('clear','1');window.parent.location.replace(url.toString());
