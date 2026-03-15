@@ -164,29 +164,43 @@ html,body{{height:100vh;overflow:hidden;}}
     padding:1px 5px !important;border-radius:4px !important;
 }}
 
-/* ── BOTTOM — stBottom is Streamlit's fixed bar ── */
+/* ── BOTTOM BAR ── */
+[data-testid="stBottom"],
+[data-testid="stBottom"]>div,
+[data-testid="stBottom"]>div>div,
+[data-testid="stBottom"]>div>div>div{{
+    background:{T["footer_bg"]} !important;
+    border:none !important;
+    box-shadow:none !important;
+    padding:0 !important;
+    margin:0 !important;
+}}
 [data-testid="stBottom"]{{
     position:fixed !important;
     bottom:0 !important;left:0 !important;right:0 !important;
-    height:80px !important;
-    background:{T["footer_bg"]} !important;
-    padding:14px 14px !important;
+    height:72px !important;
+    z-index:99999 !important;
+    box-shadow:0 -4px 20px rgba(0,0,0,0.4) !important;
     display:flex !important;
     align-items:center !important;
-    z-index:99999 !important;
-    border-top:none !important;
-    box-shadow:0 -4px 20px rgba(0,0,0,0.4) !important;
+    padding:10px 10px 10px 10px !important;
 }}
-[data-testid="stBottom"]>div{{
-    width:100% !important;padding:0 !important;margin:0 !important;
-    display:flex !important;align-items:center !important;gap:10px !important;
-}}
+
+/* Chat input wrapper — full width */
 [data-testid="stChatInput"]{{
-    background:transparent !important;border:none !important;
-    box-shadow:none !important;padding:0 !important;
-    flex:1 !important;width:100% !important;
+    background:#ffffff !important;
+    border:none !important;
+    box-shadow:none !important;
+    padding:0 !important;
+    width:100% !important;
+    border-radius:28px !important;
+    display:flex !important;
+    align-items:center !important;
+    overflow:hidden !important;
+    min-height:52px !important;
 }}
-/* White curved input */
+
+/* Textarea — full width, white, dark text */
 [data-testid="stChatInput"] textarea{{
     background:#ffffff !important;
     color:#0a1628 !important;
@@ -196,41 +210,52 @@ html,body{{height:100vh;overflow:hidden;}}
     font-family:'Outfit',sans-serif !important;
     font-size:15px !important;
     font-weight:400 !important;
-    padding:14px 20px !important;
+    padding:14px 16px !important;
     line-height:1.3 !important;
     caret-color:#1565c0 !important;
     outline:none !important;
     resize:none !important;
-    box-shadow:0 2px 12px rgba(0,0,0,0.15) !important;
+    box-shadow:none !important;
     width:100% !important;
     min-height:52px !important;
     max-height:52px !important;
+    flex:1 !important;
 }}
 [data-testid="stChatInput"] textarea::placeholder{{
     color:#90a4c0 !important;
     -webkit-text-fill-color:#90a4c0 !important;
-    font-style:italic !important;opacity:1 !important;
+    font-style:italic !important;
+    opacity:1 !important;
 }}
 [data-testid="stChatInput"] textarea:focus{{
     outline:none !important;
-    box-shadow:0 2px 16px rgba(255,255,255,0.25) !important;
+    box-shadow:none !important;
 }}
-/* Glowing gradient send button */
+
+/* Send button — gradient circle, right side */
 [data-testid="stChatInput"] button{{
     background:linear-gradient(135deg,#3b9eff,#00d4ff) !important;
-    border:none !important;border-radius:50% !important;
-    width:50px !important;height:50px !important;min-width:50px !important;
-    box-shadow:0 0 18px rgba(59,158,255,0.7),0 4px 12px rgba(0,0,0,0.3) !important;
-    flex-shrink:0 !important;cursor:pointer !important;
+    border:none !important;
+    border-radius:50% !important;
+    width:46px !important;
+    height:46px !important;
+    min-width:46px !important;
+    max-width:46px !important;
+    box-shadow:0 0 16px rgba(59,158,255,0.7) !important;
+    flex-shrink:0 !important;
+    cursor:pointer !important;
     transition:all 0.2s !important;
+    margin-right:4px !important;
 }}
 [data-testid="stChatInput"] button:hover{{
     transform:scale(1.1) !important;
-    box-shadow:0 0 28px rgba(59,158,255,0.9) !important;
+    box-shadow:0 0 26px rgba(59,158,255,1.0) !important;
 }}
 [data-testid="stChatInput"] button svg{{
-    fill:#ffffff !important;stroke:#ffffff !important;
-    width:22px !important;height:22px !important;
+    fill:#ffffff !important;
+    stroke:#ffffff !important;
+    width:20px !important;
+    height:20px !important;
 }}
 
 /* other widgets */
